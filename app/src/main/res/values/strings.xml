@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AndroidApp</string>
+    <string name="play">PLAY</string>
+    <string name="background">Background</string>
+    <string name="stop">STOP</string>
+    <string name="url">http://10.0.2.2:8080/player.mp3</string>
+</resources>

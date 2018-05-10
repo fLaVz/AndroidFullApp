@@ -1,0 +1,33 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath "gradle.plugin.com.zeroc.gradle.ice-builder:slice:1.4.5"
+
+    }
+}
+
+apply plugin: 'java'
+apply plugin: "com.zeroc.gradle.ice-builder.slice"
+
+slice {
+    java {
+        srcDir = 'app/src/main/slice'
+    }
+}
+dependencies {
+    compile 'com.zeroc:ice:3.7.0'
+}
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+
