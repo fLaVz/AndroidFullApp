@@ -1,15 +1,31 @@
 package com.androidapp;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.Environment;
+import android.speech.RecognizerIntent;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -23,9 +39,14 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.zeroc.Ice.Communicator;
 import com.zeroc.Ice.Util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import mp3App.*;
 import metaServer.*;
@@ -35,11 +56,26 @@ public class Client extends AppCompatActivity {
 	//FunctionPrx function;
 	msFunctionPrx function;
 	Communicator ic;
+	AudioManager manager;
 
 	SimpleExoPlayer mediaPlayer;
 	PlayerView playerView;
 	ListView listView;
 	TextView highlitedMusic;
+
+	Button recordButton;
+	boolean isRecording;
+	AudioRecord recorder;
+	Thread recordingThread;
+	private static final int RECORDER_SAMPLERATE = 8000;
+	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
+	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
+
+	private static final int REQUEST_EXTERNAL_STORAGE = 1;
+	private static String[] PERMISSIONS_STORAGE = {
+			Manifest.permission.READ_EXTERNAL_STORAGE,
+			Manifest.permission.WRITE_EXTERNAL_STORAGE
+	};
 
 	String selectedMusic;
 	boolean playWhenReady = true;
@@ -54,11 +90,13 @@ public class Client extends AppCompatActivity {
 		highlitedMusic = (TextView) findViewById(R.id.tv);
 		selectedMusic = "";
 
+		recordButton = findViewById(R.id.recordButton);
+		isRecording = false;
+
 		ic = Util.initialize();
 		function = msFunctionPrx.checkedCast(ic.stringToProxy("server:tcp -h 10.0.2.2 -p 4061"));
 
 		initializeMusicList();
-
 	}
 
 	private void initializePlayer() {
@@ -75,7 +113,9 @@ public class Client extends AppCompatActivity {
 		MediaSource mediaSource = buildMediaSource(uri);
 		mediaPlayer.prepare(mediaSource, true, false);
 
+
 	}
+
 
 	@Override
 	public void onStart() {
@@ -153,7 +193,66 @@ public class Client extends AppCompatActivity {
 				function.parse(selectedMusic, "play");
 				initializePlayer();
 				mediaPlayer.setPlayWhenReady(true);
+
 			}
 		});
+
+		/*
+		recordButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if(!isRecording) {
+					recordButton.setText("STOP");
+					startRecording();
+				}else if(isRecording) {
+					isRecording = false;
+					recordButton.setText("RECORD");
+					stopRecording();
+				}
+			}
+		});
+		*/
+
+		recordButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Toast.makeText(getApplicationContext(),
+						"click",
+						Toast.LENGTH_SHORT).show();
+				startSpeechToText();
+			}
+		});
+	}
+
+	public void startSpeechToText() {
+		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+				RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+		intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+				"Speak something...");
+		try {
+			startActivityForResult(intent, 666);
+		} catch (ActivityNotFoundException a) {
+			Toast.makeText(getApplicationContext(),
+					"Sorry! Speech recognition is not supported in this device.",
+					Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		switch (requestCode) {
+			case 666: {
+				if (resultCode == RESULT_OK && null != data) {
+					ArrayList<String> result = data
+							.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+					String text = result.get(0);
+					System.out.println("RECORDED : " + text);
+				}
+				break;
+			}
+		}
 	}
 }
