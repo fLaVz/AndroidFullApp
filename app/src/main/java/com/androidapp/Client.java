@@ -27,6 +27,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpResponse;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -37,12 +45,24 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.zeroc.Ice.Communicator;
+import com.zeroc.Ice.CommunicatorI;
 import com.zeroc.Ice.Util;
+import com.zeroc.IceInternal.Instance;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -141,7 +161,7 @@ public class Client extends AppCompatActivity {
 	@Override
 	public void onStop() {
 		//function.stopMusicAsync();
-		function.parse("", "stop");
+		function.parse("","stop");
 		super.onStop();
 		releasePlayer();
 	}
@@ -152,7 +172,7 @@ public class Client extends AppCompatActivity {
 			mediaPlayer.release();
 			mediaPlayer = null;
 			//function.stopMusic();
-			function.parse("", "stop");
+			function.parse("","stop");
 		}
 	}
 
@@ -219,7 +239,10 @@ public class Client extends AppCompatActivity {
 				Toast.makeText(getApplicationContext(),
 						"click",
 						Toast.LENGTH_SHORT).show();
-				startSpeechToText();
+				//startSpeechToText();
+				function.parse("play test1","json");
+				initializePlayer();
+				mediaPlayer.setPlayWhenReady(true);
 			}
 		});
 	}
@@ -250,6 +273,7 @@ public class Client extends AppCompatActivity {
 							.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 					String text = result.get(0);
 					System.out.println("RECORDED : " + text);
+
 				}
 				break;
 			}

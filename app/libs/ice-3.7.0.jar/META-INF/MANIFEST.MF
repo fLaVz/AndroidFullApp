@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Built-By: ZeroC, Inc.
+Class-Path: 
+

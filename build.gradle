@@ -23,6 +23,7 @@ slice {
 }
 dependencies {
     compile 'com.zeroc:ice:3.7.0'
+
 }
 allprojects {
     repositories {
