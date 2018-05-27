@@ -217,30 +217,14 @@ public class Client extends AppCompatActivity {
 			}
 		});
 
-		/*
-		recordButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if(!isRecording) {
-					recordButton.setText("STOP");
-					startRecording();
-				}else if(isRecording) {
-					isRecording = false;
-					recordButton.setText("RECORD");
-					stopRecording();
-				}
-			}
-		});
-		*/
-
 		recordButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				Toast.makeText(getApplicationContext(),
 						"click",
 						Toast.LENGTH_SHORT).show();
-				//startSpeechToText();					// This triggers the google speech to text next line needs to be commented (line 243)
-				function.parse("stop test1","json");
+				startSpeechToText();					// This triggers the google speech to text next line needs to be commented (line 243)
+				//function.parse("stop test1","json");
 				initializePlayer();
 				mediaPlayer.setPlayWhenReady(true);
 			}
@@ -273,7 +257,7 @@ public class Client extends AppCompatActivity {
 							.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 					String text = result.get(0);
 					System.out.println("RECORDED : " + text);
-
+					function.parseAsync(text,"json");
 				}
 				break;
 			}
