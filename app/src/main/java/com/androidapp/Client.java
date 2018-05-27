@@ -209,8 +209,8 @@ public class Client extends AppCompatActivity {
 				highlitedMusic.setText("Song selected : " + selectedMusic + ", hit the play button!");
 				//function.stopMusicAsync();
 				//function.playMusicAsync(selectedMusic);
-				function.parse(selectedMusic, "stop");
-				function.parse(selectedMusic, "play");
+				function.parse("stop", "json");
+				function.parse("play " + selectedMusic.substring(0, selectedMusic.length() - 4), "json");
 				initializePlayer();
 				mediaPlayer.setPlayWhenReady(true);
 
@@ -239,8 +239,8 @@ public class Client extends AppCompatActivity {
 				Toast.makeText(getApplicationContext(),
 						"click",
 						Toast.LENGTH_SHORT).show();
-				//startSpeechToText();
-				function.parse("play test1","json");
+				//startSpeechToText();					// This triggers the google speech to text next line needs to be commented (line 243)
+				function.parse("stop test1","json");
 				initializePlayer();
 				mediaPlayer.setPlayWhenReady(true);
 			}
